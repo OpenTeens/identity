@@ -45,7 +45,7 @@ class ClientInfo(BaseModel):
     redirect_uri: str = ""
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 @app.get("/api/client/{client_id}/info", response_model=ClientInfo)
