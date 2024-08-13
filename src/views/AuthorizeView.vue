@@ -151,7 +151,8 @@ const perm_danger_badge_val: { [key: number]: string } = {
                     </var-cell>
                 </div>
 
-                <var-divider />
+                <!-- <var-divider /> -->
+                 <br>
 
                 <var-row>
                     <var-col :span="11">
