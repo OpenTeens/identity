@@ -65,53 +65,58 @@ const error = computed(() => {
 })
 
 // get scope detail
-function get_scope_detail(scope: string) {
-    switch (scope) {
-        case 'openid':
-            return {
-                "title": "OpenID",
-                "desc": "The OpenID of your account",
-                "icon": "card-account-details",
-                "danger": 0
-            };
-        case 'profile':
-            return {
-                "title": "Profile",
-                "desc": "Your profile information",
-                "icon": "account-circle",
-                "danger": 0
-            };
-        case 'email':
-            return {
-                "title": "Email",
-                "desc": "Your email address",
-                "icon": "email",
-                "danger": 0
-            };
-        case 'phone':
-            return {
-                "title": "Phone",
-                "desc": "Your phone number",
-                "icon": "phone",
-                "danger": 0
-            };
-        case 'address':
-            return {
-                "title": "Address",
-                "desc": "Your address",
-                "icon": "map-marker",
-                "danger": 1
-            };
-        default:
-            return {
-                "title": "Unknown",
-                "desc": "Unknown scope",
-                "icon": "help",
-                "danger": 2
-            };
+const scope_describe: { [key: string]: { title: string; desc: string; icon: string; danger: number } } = {
+    "openid": {
+        "title": "OpenID",
+        "desc": "The OpenID of your account",
+        "icon": "card-account-details",
+        "danger": 0
+    },
+    "profile": {
+        "title": "Profile",
+        "desc": "Your profile information",
+        "icon": "account-circle",
+        "danger": 0
+    },
+    "email": {
+        "title": "Email",
+        "desc": "Your email address",
+        "icon": "email",
+        "danger": 0
+    },
+    "phone": {
+        "title": "Phone",
+        "desc": "Your phone number",
+        "icon": "phone",
+        "danger": 0
+    },
+    "address": {
+        "title": "Address",
+        "desc": "Your address",
+        "icon": "map-marker",
+        "danger": 1
+    },
+    "__DEFAULT__": {
+        "title": "Unknown",
+        "desc": "Unknown permission",
+        "icon": "help",
+        "danger": 2
     }
 }
-var scope_detail = data.scope.split(" ").map(get_scope_detail);
+var scope_detail = data.scope.split(" ").map((x) => scope_describe[x.toLowerCase()] || scope_describe["__DEFAULT__"]);
+
+const perm_danger_badge_type: { [key: number]: string } = {
+    1: "warning",
+    2: "danger",
+    3: "danger"
+}
+const perm_danger_badge_val: { [key: number]: string } = {
+    0: "Normal",
+    1: "Sensitive",
+    2: "Dangerous",
+    3: "Critical"
+}
+
 // Theme
 // StyleProvider(Themes.md3Dark);
 </script>
@@ -124,9 +129,9 @@ var scope_detail = data.scope.split(" ").map(get_scope_detail);
         <div id="authbox" v-else-if="error === ''">
             <var-paper id="area-avatar" :radius="3">
                 <var-space align="center" justify="center">
-                    <var-avatar src="https://openteens.org/img/logo/build/circle.png" class="var-elevation--2" />
+                    <var-avatar src="https://openteens.org/img/p/leo_huo.jpg" class="var-elevation--2" />
                     <var-loading type="wave" />
-                    <var-avatar src="https://openteens.org/img/logo/build/circle.png" class="var-elevation--2"
+                    <var-avatar src="https://openteens.org/img/logo/build/full_white.png" class="var-elevation--2"
                         :round="false" />
                 </var-space>
             </var-paper>
@@ -140,7 +145,8 @@ var scope_detail = data.scope.split(" ").map(get_scope_detail);
                     <var-cell border :icon="x.icon" :title="x.title" :description="x.desc"
                         :class="'permfield-dangerlv--' + x.danger">
                         <template #extra>
-                            <var-icon name="information" class="transparent-50" />
+                            <var-badge v-if="x.danger == 0" :value="perm_danger_badge_val[x.danger]"></var-badge>
+                            <var-badge v-else :type="perm_danger_badge_type[x.danger]" :value="perm_danger_badge_val[x.danger]"></var-badge>
                         </template>
                     </var-cell>
                 </div>
@@ -179,10 +185,16 @@ var scope_detail = data.scope.split(" ").map(get_scope_detail);
 
 .var-avatar {
     background-color: transparent;
+    user-select: none;
 }
 
-.transparent-50 {
+.var-badge {
     opacity: 0.5;
+    user-select: none;
+
+    &:hover {
+        opacity: 1;
+    }
 }
 
 /* Permission Sensitivity Alert */
