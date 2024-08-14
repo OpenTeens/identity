@@ -5,6 +5,13 @@ import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import axios from 'axios';
 import { StyleProvider, Themes } from '@varlet/ui';
+import i18n from '../i18n.ts';
+
+// i18n
+const getI18n = (raw: string) => {
+    let result = computed(() => i18n.global.t(raw))
+    return result.value;
+}
 
 const data = useUrlSearchParams<AuthorizeParams>('hash');
 const info = ref({
@@ -67,42 +74,43 @@ const error = computed(() => {
 // get scope detail
 const scope_describe: { [key: string]: { title: string; desc: string; icon: string; danger: number } } = {
     "openid": {
-        "title": "OpenID",
-        "desc": "The OpenID of your account",
+        "title": getI18n('openid_title'),
+        "desc": getI18n('openid_desc'),
         "icon": "card-account-details",
         "danger": 0
     },
     "profile": {
-        "title": "Profile",
-        "desc": "Your profile information",
+        "title": getI18n('profile_title'),
+        "desc": getI18n('profile_desc'),
         "icon": "account-circle",
         "danger": 0
     },
     "email": {
-        "title": "Email",
-        "desc": "Your email address",
+        "title": getI18n('email_title'),
+        "desc": getI18n('email_desc'),
         "icon": "email",
         "danger": 0
     },
     "phone": {
-        "title": "Phone",
-        "desc": "Your phone number",
+        "title": getI18n('phone_title'),
+        "desc": getI18n('phone_desc'),
         "icon": "phone",
         "danger": 0
     },
     "address": {
-        "title": "Address",
-        "desc": "Your address",
+        "title": getI18n('address_title'),
+        "desc": getI18n('address_desc'),
         "icon": "map-marker",
         "danger": 1
     },
     "__DEFAULT__": {
-        "title": "Unknown",
-        "desc": "Unknown permission",
+        "title": getI18n('unknown_title'),
+        "desc": getI18n('unknown_desc'),
         "icon": "help",
         "danger": 2
     }
 }
+
 var scope_detail = data.scope.split(" ").map((x) => scope_describe[x.toLowerCase()] || scope_describe["__DEFAULT__"]);
 
 const perm_danger_badge_type: { [key: number]: string } = {
@@ -124,7 +132,7 @@ const perm_danger_badge_val: { [key: number]: string } = {
 <template>
     <var-space id="mainbox" :size="[10, 10]" justify="space-between">
         <div v-if="info.status === 0">
-            Loading...
+            {{ $t('loading') }}
         </div>
         <div id="authbox" v-else-if="error === ''">
             <var-paper id="area-avatar" :radius="3">
@@ -137,11 +145,11 @@ const perm_danger_badge_val: { [key: number]: string } = {
             </var-paper>
 
             <var-paper id="area-authorize" :elevation="2" :radius="8">
-                应用 <span class="app-name">{{ info.app_name }}</span> 正在请求以下权限:
+                {{ $t('app_request') }} <span class="app-name">{{ info.app_name }}</span> {{ $t('permissions') }}:
 
                 <var-divider />
 
-                <div v-for="x in scope_detail">
+                <div v-for="x in scope_detail" :key="x.title">
                     <var-cell border :icon="x.icon" :title="x.title" :description="x.desc"
                         :class="'permfield-dangerlv--' + x.danger">
                         <template #extra>
@@ -156,20 +164,21 @@ const perm_danger_badge_val: { [key: number]: string } = {
 
                 <var-row>
                     <var-col :span="11">
-                        <var-button block v-on:click="cancel">Cancel</var-button>
+                        <var-button block v-on:click="cancel">{{ $t('cancel') }}</var-button>
                     </var-col>
                     <var-col :span="2"></var-col>
                     <var-col :span="11">
-                        <var-button block type="primary" v-on:click="approve">Approve</var-button>
+                        <var-button block type="primary" v-on:click="approve">{{ $t('approve') }}</var-button>
                     </var-col>
                 </var-row>
             </var-paper>
         </div>
         <div v-else>
-            Error: {{ error }}
+            {{ $t('error') }}: {{ error }}
         </div>
     </var-space>
 </template>
+
 
 <style scoped>
 .app-name {

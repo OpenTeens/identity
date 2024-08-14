@@ -7,6 +7,7 @@ import App from './App.vue';
 import IndexView from "./views/IndexView.vue";
 import AuthorizeView from "./views/AuthorizeView.vue";
 import '@varlet/ui/es/style'
+import i18n from './i18n';
 
 // import { createVuetify } from 'vuetify';
 // import * as components from 'vuetify/components'
@@ -35,7 +36,9 @@ const router = createRouter({
     routes
 });
 
+
 app.use(router);
 app.use(Varlet);
+app.use(i18n)
 app.mount('#app');
 
