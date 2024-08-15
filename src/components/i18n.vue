@@ -49,6 +49,8 @@ const selectLanguage = (code) => {
     localStorage.setItem("lang", code);
     active = code;
     isOpen.value = false;
+    // refresh page
+    location.reload();
 };
 </script>
 
