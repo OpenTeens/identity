@@ -119,10 +119,10 @@ const perm_danger_badge_type: { [key: number]: string } = {
     3: "danger"
 }
 const perm_danger_badge_val: { [key: number]: string } = {
-    0: "Normal",
-    1: "Sensitive",
-    2: "Dangerous",
-    3: "Critical"
+    0: getI18n('normal'),
+    1: getI18n('sensitive'),
+    2: getI18n('danger'),
+    3: getI18n('critical'),
 }
 
 // Theme
@@ -201,6 +201,7 @@ const perm_danger_badge_val: { [key: number]: string } = {
 .var-badge {
     opacity: 0.5;
     user-select: none;
+    white-space: nowrap;
 
     &:hover {
         opacity: 1;
