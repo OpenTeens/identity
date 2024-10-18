@@ -1,16 +1,40 @@
-from .base import Base
-from sqlalchemy import String
+import datetime
+
+from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column
+
+from .base import Base
 
 
 class User(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
-    username: Mapped[str] = mapped_column(String(30))
-    hashed_passwd = mapped_column(String(128))
+
+    # Basic Auth Info
+    username: Mapped[str] = mapped_column(String(16))
+    hashed_password = mapped_column(String(128))  # Use Argon2id
+
+    # Adv Auth Info
+    email: Mapped[str] = mapped_column(String(32))
+    mtf_verified: Mapped[bool]
+
+    # Account Status
+    activated: Mapped[bool]
+    read_only: Mapped[bool]
+    can_login: Mapped[bool]
+    shadow_banned: Mapped[bool]  # Reserved Column
+
+    # Personal Info
+    nickname: Mapped[str] = mapped_column(String(32))
+    avatar_url: Mapped[str] = mapped_column(String(96))
+    bio: Mapped[str] = mapped_column(Text())
+    birth: Mapped[datetime.datetime | None]
+    join: Mapped[datetime.datetime]
+    website: Mapped[str] = mapped_column(String(64))
+    phone: Mapped[str] = mapped_column(String(16))
 
     def __repr__(self) -> str:
-        return f"<User(id={self.id}, username={self.username})>"
+        return f"<User(id={self.id}, username={self.username}, activated={self.activated})>"
 
 
 class OAuthApp(Base):
