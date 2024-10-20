@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from enum import StrEnum
 from typing import Annotated, Callable, Any, Awaitable, Literal
@@ -17,14 +18,16 @@ from utils import random_str
 
 from settings import identity_app_settings
 
-app = FastAPI()
-hasher = argon2.PasswordHasher(time_cost=1, memory_cost=4096)
 
-
-@app.on_event("startup")
-async def make_tables():
+@asynccontextmanager
+async def lifespan(application: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+hasher = argon2.PasswordHasher(time_cost=1, memory_cost=4096)
 
 
 class ClientInfo(BaseModel):
