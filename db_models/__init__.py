@@ -16,22 +16,22 @@ class User(Base):
 
     # Adv Auth Info
     email: Mapped[str] = mapped_column(String(32))
-    mtf_verified: Mapped[bool]
+    mtf_verified: Mapped[bool] = mapped_column(default=False)
 
     # Account Status
-    activated: Mapped[bool]
-    read_only: Mapped[bool]
-    can_login: Mapped[bool]
-    shadow_banned: Mapped[bool]  # Reserved Column
+    activated: Mapped[bool] = mapped_column(default=False)
+    read_only: Mapped[bool] = mapped_column(default=False)
+    can_login: Mapped[bool] = mapped_column(default=True)
+    shadow_banned: Mapped[bool] = mapped_column(default=False)  # Reserved Column
 
     # Personal Info
     nickname: Mapped[str] = mapped_column(String(32))
-    avatar_url: Mapped[str] = mapped_column(String(96))
-    bio: Mapped[str] = mapped_column(Text())
-    birth: Mapped[datetime.datetime | None]
-    join: Mapped[datetime.datetime]
-    website: Mapped[str] = mapped_column(String(64))
-    phone: Mapped[str] = mapped_column(String(16))
+    avatar_url: Mapped[str | None] = mapped_column(String(96))
+    bio: Mapped[str | None] = mapped_column(Text())
+    birth: Mapped[datetime.date | None]
+    joined_at: Mapped[datetime.datetime]
+    website: Mapped[str | None] = mapped_column(String(64))
+    phone: Mapped[str | None] = mapped_column(String(16))
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, username={self.username}, activated={self.activated})>"
