@@ -1,6 +1,9 @@
-import logging  # noqa: D100
+from __future__ import annotations  # noqa: D100
+
+import logging
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import StrEnum
 from typing import Annotated
 
@@ -23,7 +26,7 @@ from utils.servers import ASGIServer, detect_server
 
 
 @asynccontextmanager
-async def lifespan(application: FastAPI):  # noqa: D103
+async def lifespan(application: FastAPI) -> AsyncGenerator:  # noqa: D103
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
@@ -35,6 +38,9 @@ hasher = argon2.PasswordHasher(time_cost=1, memory_cost=4096)
 
 webserver = detect_server()
 logger = logging.getLogger(__name__)
+
+tz = datetime.now(timezone.utc).astimezone().tzinfo
+
 
 class ClientInfo(BaseModel):  # noqa: D101
     status: int = 500
@@ -62,7 +68,8 @@ class ErrorWithDetail(BaseModel):  # noqa: D101
     },
 )
 async def client_info(  # noqa: D103
-    client_id: str, db_session: AsyncSession = Depends(get_db)
+    client_id: str,
+    db_session: Annotated[AsyncSession, Depends(get_db)],
 ) -> ClientInfo:
     stmt = select(OAuthApp).where(OAuthApp.client_id == client_id)
     result = (await db_session.execute(stmt)).one_or_none()
@@ -95,7 +102,7 @@ class CodeResponse(BaseModel):  # noqa: D101
 async def approve_authorize(  # noqa: D103
     data: ApproveData,
     request: Request,
-    db_session: AsyncSession = Depends(get_db),
+    db_session: Annotated[AsyncSession, Depends(get_db)],
 ) -> CodeResponse:
     if "username" not in request.cookies:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -147,13 +154,13 @@ class GrantTypes(StrEnum):  # noqa: D101
         404: {"model": ErrorWithDetail},
     },
 )
-async def token_endpoint(  # noqa: D103
+async def token_endpoint(  # noqa: D103, PLR0913, PLR0917
     grant_type: Annotated[GrantTypes, Form()],
     code: Annotated[str, Form()],
     client_id: Annotated[str, Form()],
     client_secret: Annotated[str, Form()],
     redirect_uri: Annotated[str, Form()],
-    db_session: AsyncSession = Depends(get_db),
+    db_session: Annotated[AsyncSession, Depends(get_db)],
 ) -> TokenResponse:
     if grant_type == GrantTypes.AUTHORIZATION_CODE:
         stmt = select(Code).where(Code.code == code)
@@ -185,11 +192,13 @@ async def token_endpoint(  # noqa: D103
             resp_data.id_token = code_obj.id_token
         return resp_data
 
-    else:
-        raise HTTPException(status_code=404, detail="Unsupported grant_type")
+    raise HTTPException(status_code=404, detail="Unsupported grant_type")
 
 
-# TODO: Data validation
+# TODO @cxzlw: Data validation
+# https://
+
+
 class RegisterReq(BaseModel):  # noqa: D101
     username: str
     password: str
@@ -200,11 +209,6 @@ class RegisterReq(BaseModel):  # noqa: D101
 class LoginReq(BaseModel):  # noqa: D101
     login: str
     password: str
-
-
-# class SuccessOrReason(BaseModel):
-#     success: bool
-#     reason: str
 
 
 class AuthTokenResponse(BaseModel):  # noqa: D101
@@ -229,7 +233,7 @@ class AuthTokenPayload(BaseModel):  # noqa: D101
 async def register(  # noqa: D103
     register_req: RegisterReq,
     response: Response,
-    db_session: AsyncSession = Depends(get_db),
+    db_session: Annotated[AsyncSession, Depends(get_db)],
 ) -> AuthTokenResponse:
     # Check if username exists
     stmt = select(1).where(User.username == register_req.username)
@@ -250,7 +254,7 @@ async def register(  # noqa: D103
         email=register_req.email,
         nickname=register_req.nickname,
         hashed_password=hashed_password,
-        joined_at=datetime.now(),
+        joined_at=datetime.now(tz=tz),
     )
 
     db_session.add(new_user)
@@ -258,8 +262,8 @@ async def register(  # noqa: D103
 
     token_payload = AuthTokenPayload(
         user_id=new_user.id,
-        created_at=datetime.now().timestamp(),
-        expire_at=(datetime.now() + timedelta(days=7)).timestamp(),
+        created_at=datetime.now(tz=tz).timestamp(),
+        expire_at=(datetime.now(tz=tz) + timedelta(days=7)).timestamp(),
     )
 
     await (
@@ -285,7 +289,9 @@ async def register(  # noqa: D103
     },
 )
 async def login(  # noqa: D103
-    login_req: LoginReq, response: Response, db_session: AsyncSession = Depends(get_db)
+    login_req: LoginReq,
+    response: Response,
+    db_session: Annotated[AsyncSession, Depends(get_db)],
 ) -> AuthTokenResponse:
     stmt = select(User).where(
         (User.username == login_req.login) | (User.email == login_req.login)
@@ -302,8 +308,8 @@ async def login(  # noqa: D103
 
     token_payload = AuthTokenPayload(
         user_id=result.id,
-        created_at=datetime.now().timestamp(),
-        expire_at=(datetime.now() + timedelta(days=7)).timestamp(),
+        created_at=datetime.now(tz=tz).timestamp(),
+        expire_at=(datetime.now(tz=tz) + timedelta(days=7)).timestamp(),
     )
 
     token = jwt.encode(
@@ -338,4 +344,3 @@ if not identity_app_settings.is_prod:
 if identity_app_settings.secret == settings.default_secret:
     logger.warning("App is using default secret which is uploaded to the GitHub repo. ")
     logger.warning("Change it to a strong secret in production.")
-
