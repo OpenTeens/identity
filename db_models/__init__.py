@@ -1,4 +1,4 @@
-import datetime
+import datetime  # noqa: D104
 
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
 
 
-class User(Base):
+class User(Base):  # noqa: D101
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
 
@@ -33,11 +33,14 @@ class User(Base):
     website: Mapped[str | None] = mapped_column(String(64))
     phone: Mapped[str | None] = mapped_column(String(16))
 
-    def __repr__(self) -> str:
-        return f"<User(id={self.id}, username={self.username}, activated={self.activated})>"
+    def __repr__(self) -> str:  # noqa: D105
+        return (
+            f"<User(id={self.id}, username={self.username}, "
+            f"activated={self.activated})>"
+        )
 
 
-class OAuthApp(Base):
+class OAuthApp(Base):  # noqa: D101
     __tablename__ = "oauth_apps"
     id: Mapped[int] = mapped_column(primary_key=True)
     app_name: Mapped[str] = mapped_column(String(30))
@@ -47,11 +50,11 @@ class OAuthApp(Base):
     redirect_uri: Mapped[str] = mapped_column(String(256))
     allowed_scopes: Mapped[str] = mapped_column(String(256))
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # noqa: D105
         return f"<OAuthApp(client_id={self.client_id})>"
 
 
-class Code(Base):
+class Code(Base):  # noqa: D101
     __tablename__ = "codes"
     code: Mapped[str] = mapped_column(String(32), primary_key=True)
     client_id: Mapped[str] = mapped_column(String(32))
@@ -60,5 +63,5 @@ class Code(Base):
     access_token: Mapped[str] = mapped_column(String(32))
     id_token: Mapped[str] = mapped_column(String(1024))
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> str:  # noqa: D105
         return f"<Code(code={self.code})>"

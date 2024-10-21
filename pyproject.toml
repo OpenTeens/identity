@@ -21,6 +21,41 @@ rich = "^13.9.2"
 pyyaml = "^6.0.2"
 ruff = "^0.7.0"
 
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "B",
+    "SIM",
+    "I",
+    "UP",
+    "RUF",
+    "D",
+]
+
+ignore = [
+    "B008",
+    "W191",
+    "E117",
+    "E111",
+    "E114",
+    "D206",
+    "D300",
+    "Q000",
+    "Q001",
+    "Q002",
+    "Q003",
+    "COM812",
+    "COM819",
+    "ISC001",
+    "ISC002",
+    "E501",
+    "E701",
+    "E203",
+    "D202",
+    "D203",
+    "D213",
+]
 
 [build-system]
 requires = ["poetry-core"]

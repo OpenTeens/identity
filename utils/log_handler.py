@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime  # noqa: D100
 from logging import LogRecord
 from typing import Optional
 
@@ -8,7 +8,7 @@ from rich.traceback import Traceback
 from typing_extensions import override
 
 
-class MyHandler(RichHandler):
+class MyHandler(RichHandler):  # noqa: D101
     @override
     def render(
         self,
@@ -19,13 +19,13 @@ class MyHandler(RichHandler):
     ) -> "ConsoleRenderable":
         """Render log for display.
 
-        Args:
-            record (LogRecord): logging Record.
-            traceback (Optional[Traceback]): Traceback instance or None for no Traceback.
-            message_renderable (ConsoleRenderable): Renderable (typically Text) containing log message contents.
+        Args: record (LogRecord): logging Record. traceback (Optional[Traceback]):
+        Traceback instance or None for no Traceback. message_renderable (
+        ConsoleRenderable): Renderable (typically Text) containing log message contents.
 
         Returns:
             ConsoleRenderable: Renderable to display log.
+
         """
         level = self.get_level_text(record)
         time_format = None if self.formatter is None else self.formatter.datefmt

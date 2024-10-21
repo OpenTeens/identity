@@ -1,9 +1,8 @@
-from random import Random
+from random import Random  # noqa: D100
 from typing import Self
 
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
 
 rand = Random("7ytgfvbghy")  # 保证每次运行都使用同一个默认 secret
 default_secret = rand.randbytes(
@@ -11,7 +10,7 @@ default_secret = rand.randbytes(
 ).hex()  # 默认密钥会出现在GitHub仓库中因此绝对不可以用于生产环境
 
 
-class IdentityAppSettings(BaseSettings):
+class IdentityAppSettings(BaseSettings):  # noqa: D101
     model_config = SettingsConfigDict(
         env_file=[
             ".env",
@@ -21,7 +20,7 @@ class IdentityAppSettings(BaseSettings):
     )
 
     @model_validator(mode="after")
-    def check_secret(self) -> Self:
+    def check_secret(self) -> Self:  # noqa: D102
         if self.is_prod and self.secret == default_secret:
             raise ValueError("Secret cannot be default in production")
         return self
