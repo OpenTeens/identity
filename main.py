@@ -1,33 +1,39 @@
+import logging
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from enum import StrEnum
-from typing import Annotated, Callable, Any, Awaitable, Literal
+from typing import Annotated
 
 import argon2
 import jwt
 from argon2.exceptions import VerifyMismatchError
-from fastapi import FastAPI, Request, Response, status, Form, Depends, HTTPException
+from fastapi import FastAPI, Request, Response, Form, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel, model_serializer
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db_manager import engine, get_db
 from db_models import Base, User, OAuthApp, Code
+from utils.log_handler import MyHandler
 from utils import random_str
 
 from settings import identity_app_settings
+from utils.servers import detect_server, ASGIServer
 
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
     yield
 
 
 app = FastAPI(lifespan=lifespan)
 hasher = argon2.PasswordHasher(time_cost=1, memory_cost=4096)
+
+webserver = detect_server()
 
 
 class ClientInfo(BaseModel):
@@ -310,3 +316,23 @@ async def login(
 
     response.set_cookie("token", token)
     return AuthTokenResponse(token=token)
+
+
+if webserver == ASGIServer.UVICORN:
+    uvicorn_logger = logging.getLogger("uvicorn")
+    uvicorn_access_logger = logging.getLogger("uvicorn.access")
+
+    uvicorn_logger.handlers = []
+    uvicorn_access_logger.handlers = []
+
+    uvicorn_logger.propagate = True
+    uvicorn_access_logger.propagate = True
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    datefmt="[%x %X]",
+    format="{message}",
+    style="{",
+    handlers=[MyHandler()],
+)

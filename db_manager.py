@@ -1,8 +1,12 @@
+import logging
+
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
 engine = create_async_engine(
     "sqlite+aiosqlite:///data.db",
-    echo=True,
+    # echo=True,
     future=True,
     connect_args={"check_same_thread": False},
 )
