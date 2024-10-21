@@ -37,6 +37,7 @@ webserver = detect_server()
 
 
 class ClientInfo(BaseModel):
+    status: int = 500
     id: int = -1
     app_name: str = ""
     app_desc: str = ""
@@ -73,6 +74,7 @@ async def client_info(
 
     if not result:
         return ErrorWithDetail(status_code=404, detail="Client not found")
+    result[0].status = 200
     return ClientInfo(**jsonable_encoder(result[0]))
 
 
