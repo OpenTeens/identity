@@ -1,6 +1,5 @@
 from datetime import datetime
 from logging import LogRecord
-from pathlib import Path
 from typing import Optional
 
 from rich.console import ConsoleRenderable
@@ -28,7 +27,6 @@ class MyHandler(RichHandler):
         Returns:
             ConsoleRenderable: Renderable to display log.
         """
-        path = Path(record.pathname).name
         level = self.get_level_text(record)
         time_format = None if self.formatter is None else self.formatter.datefmt
         log_time = datetime.fromtimestamp(record.created)

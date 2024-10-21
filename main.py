@@ -262,7 +262,9 @@ async def register(
         expire_at=(datetime.now() + timedelta(days=7)).timestamp(),
     )
 
-    await db_session.commit()  # Commit as soon as possible to avoid conflicts and rollback
+    await (
+        db_session.commit()
+    )  # Commit as soon as possible to avoid conflicts and rollback
 
     token = jwt.encode(
         token_payload.model_dump(),

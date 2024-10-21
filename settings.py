@@ -1,7 +1,7 @@
 from random import Random
 from typing import Self
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -12,7 +12,6 @@ default_secret = rand.randbytes(
 
 
 class IdentityAppSettings(BaseSettings):
-
     model_config = SettingsConfigDict(
         env_file=[
             ".env",
