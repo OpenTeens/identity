@@ -14,7 +14,7 @@ class MyHandler(RichHandler):  # noqa: D101
         self,
         *,
         record: LogRecord,
-        traceback: Optional[Traceback],
+        traceback: Optional[Traceback],  # noqa: FA100
         message_renderable: "ConsoleRenderable",
     ) -> "ConsoleRenderable":
         """Render log for display.
@@ -29,9 +29,9 @@ class MyHandler(RichHandler):  # noqa: D101
         """
         level = self.get_level_text(record)
         time_format = None if self.formatter is None else self.formatter.datefmt
-        log_time = datetime.fromtimestamp(record.created)
+        log_time = datetime.fromtimestamp(record.created)  # noqa: DTZ006
 
-        log_renderable = self._log_render(
+        return self._log_render(
             self.console,
             [message_renderable] if not traceback else [message_renderable, traceback],
             log_time=log_time,
@@ -41,4 +41,3 @@ class MyHandler(RichHandler):  # noqa: D101
             line_no=None,
             link_path=record.pathname if self.enable_link_path else None,
         )
-        return log_renderable

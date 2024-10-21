@@ -1,4 +1,6 @@
-import datetime  # noqa: D104
+from __future__ import annotations  # noqa: D104
+
+import datetime
 
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column

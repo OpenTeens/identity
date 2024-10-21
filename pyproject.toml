@@ -1,9 +1,15 @@
-[tool.poetry]
+[project]
 name = "identity-backend"
 version = "0.1.0"
 description = ""
-authors = ["cxzlw <wsc_zds@qq.com>"]
+authors = [
+    { name = "OpenTeens" },
+    { name = "mtf-im" }
+]
 readme = "README.md"
+requires-python = "<4.0, >= 3.9"
+
+[tool.poetry]
 package-mode = false
 
 [tool.poetry.dependencies]
@@ -22,6 +28,7 @@ pyyaml = "^6.0.2"
 ruff = "^0.7.0"
 
 [tool.ruff.lint]
+preview = true
 select = [
     "E",
     "F",
@@ -31,10 +38,35 @@ select = [
     "UP",
     "RUF",
     "D",
+    "C90",
+    "N",
+    "ANN201",
+    "FA",
+    "A",
+    "C4",
+    "DTZ",
+    "ICN",
+    "ISC",
+    "LOG",
+    "INP",
+    "PIE",
+    "T20",
+    "Q",
+    "RET",
+    "SLF",
+    "SIM",
+    "TID",
+    "PTH",
+    "TD",
+    "ERA",
+    "PL",
+    "FAST",
+    "FLY",
+    "PERF",
+    "FURB",
 ]
 
 ignore = [
-    "B008",
     "W191",
     "E117",
     "E111",
