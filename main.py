@@ -50,12 +50,7 @@ class ClientInfo(BaseModel):
 
 
 class ErrorWithDetail(BaseModel):
-    status_code: int = 400
     detail: str = "Error details. "
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        raise HTTPException(status_code=self.status_code, detail=self.detail)
 
 
 @app.get(
@@ -68,14 +63,13 @@ class ErrorWithDetail(BaseModel):
 )
 async def client_info(
     client_id: str, db_session: AsyncSession = Depends(get_db)
-) -> ClientInfo | ErrorWithDetail:
+) -> ClientInfo:
     stmt = select(OAuthApp).where(OAuthApp.client_id == client_id)
     result = (await db_session.execute(stmt)).one_or_none()
 
     if not result:
-        return ErrorWithDetail(status_code=404, detail="Client not found")
-    result[0].status = 200
-    return ClientInfo(**jsonable_encoder(result[0]))
+        raise HTTPException(status_code=404, detail="Client not found")
+    return ClientInfo(status=200, **jsonable_encoder(result[0]))
 
 
 class ApproveData(BaseModel):
@@ -102,15 +96,15 @@ async def approve_authorize(
     data: ApproveData,
     request: Request,
     db_session: AsyncSession = Depends(get_db),
-) -> CodeResponse | ErrorWithDetail:
+) -> CodeResponse:
     if "username" not in request.cookies:
-        return ErrorWithDetail(status_code=401, detail="Unauthorized")
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     stmt = select(OAuthApp).where(OAuthApp.client_id == data.client_id)
     oauth_app_result = (await db_session.execute(stmt)).one_or_none()
 
     if not oauth_app_result:
-        return ErrorWithDetail(status_code=404, detail="Invalid client_id")
+        raise HTTPException(status_code=404, detail="Invalid client_id")
     oauth_app_obj: OAuthApp = oauth_app_result[0]
 
     code_obj = Code(
@@ -160,26 +154,26 @@ async def token_endpoint(
     client_secret: Annotated[str, Form()],
     redirect_uri: Annotated[str, Form()],
     db_session: AsyncSession = Depends(get_db),
-) -> TokenResponse | ErrorWithDetail:
+) -> TokenResponse:
     if grant_type == GrantTypes.AUTHORIZATION_CODE:
         stmt = select(Code).where(Code.code == code)
         code_result = (await db_session.execute(stmt)).one_or_none()
         if not code_result:
-            return ErrorWithDetail(status_code=404, detail="Invalid code")
+            raise HTTPException(status_code=404, detail="Invalid code")
         code_obj: Code = code_result[0]
         if code_obj.client_id != client_id:
-            return ErrorWithDetail(status_code=403, detail="Invalid client_id")
+            raise HTTPException(status_code=403, detail="Invalid client_id")
         if code_obj.redirect_uri != redirect_uri:
-            return ErrorWithDetail(status_code=403, detail="Invalid redirect_uri")
+            raise HTTPException(status_code=403, detail="Invalid redirect_uri")
 
         stmt = select(OAuthApp).where(OAuthApp.client_id == client_id)
         oauth_app_result = (await db_session.execute(stmt)).one_or_none()
 
         if not oauth_app_result:
-            return ErrorWithDetail(status_code=404, detail="Invalid client_id")
+            raise HTTPException(status_code=404, detail="Invalid client_id")
         oauth_app_obj: OAuthApp = oauth_app_result[0]
         if oauth_app_obj.client_secret != client_secret:
-            return ErrorWithDetail(status_code=403, detail="Invalid client_secret")
+            raise HTTPException(status_code=403, detail="Invalid client_secret")
 
         resp_data = TokenResponse(
             access_token=code_obj.access_token,
@@ -192,7 +186,7 @@ async def token_endpoint(
         return resp_data
 
     else:
-        return ErrorWithDetail(status_code=404, detail="Unsupported grant_type")
+        raise HTTPException(status_code=404, detail="Unsupported grant_type")
 
 
 # TODO: Data validation
@@ -236,18 +230,18 @@ async def register(
     register_req: RegisterReq,
     response: Response,
     db_session: AsyncSession = Depends(get_db),
-):
+) -> AuthTokenResponse:
     # Check if username exists
     stmt = select(1).where(User.username == register_req.username)
     result = (await db_session.execute(stmt)).scalar()
     if result:
-        return ErrorWithDetail(status_code=409, detail="Username exists")
+        raise HTTPException(status_code=409, detail="Username exists")
 
     # Check if email exists
     stmt = select(1).where(User.email == register_req.email)
     result = (await db_session.execute(stmt)).scalar()
     if result:
-        return ErrorWithDetail(status_code=409, detail="Email exists")
+        raise HTTPException(status_code=409, detail="Email exists")
 
     hashed_password = hasher.hash(register_req.password)
 
@@ -290,19 +284,19 @@ async def register(
 )
 async def login(
     login_req: LoginReq, response: Response, db_session: AsyncSession = Depends(get_db)
-):
+) -> AuthTokenResponse:
     stmt = select(User).where(
         (User.username == login_req.login) | (User.email == login_req.login)
     )
     result = (await db_session.execute(stmt)).scalar()
 
     if not result:
-        return ErrorWithDetail(status_code=401, detail="Invalid credentials")
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
     try:
         hasher.verify(result.hashed_password, login_req.password)
     except VerifyMismatchError:
-        return ErrorWithDetail(status_code=401, detail="Invalid credentials")
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
     token_payload = AuthTokenPayload(
         user_id=result.id,
