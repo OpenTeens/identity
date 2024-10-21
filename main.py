@@ -317,12 +317,8 @@ async def login(
 if webserver == ASGIServer.UVICORN:
     uvicorn_logger = logging.getLogger("uvicorn")
     uvicorn_access_logger = logging.getLogger("uvicorn.access")
-
-    uvicorn_logger.handlers = []
-    uvicorn_access_logger.handlers = []
-
-    uvicorn_logger.propagate = True
-    uvicorn_access_logger.propagate = True
+    uvicorn_logger.handlers = uvicorn_access_logger.handlers = []
+    uvicorn_logger.propagate = uvicorn_access_logger.propagate = True
 
 
 logging.basicConfig(
