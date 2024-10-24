@@ -14,6 +14,7 @@ class IdentityAppSettings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=[
             ".env",
+            ".dev.env",
             ".prod.env",
             ".secrets.env",
         ]
