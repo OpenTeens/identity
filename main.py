@@ -1,4 +1,4 @@
-from __future__ import annotations  # noqa: D100
+from __future__ import annotations
 
 import logging
 from collections.abc import AsyncGenerator
@@ -12,7 +12,7 @@ import jwt
 from argon2.exceptions import VerifyMismatchError
 from fastapi import Depends, FastAPI, Form, HTTPException, Request, Response
 from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,13 +20,13 @@ import settings
 from db_manager import engine, get_db
 from db_models import Base, Code, OAuthApp, User
 from settings import identity_app_settings
-from utils import random_str
 from utils.log_handler import MyHandler
+from utils.randoms import random_str
 from utils.servers import ASGIServer, detect_server
 
 
 @asynccontextmanager
-async def lifespan(application: FastAPI) -> AsyncGenerator:  # noqa: D103
+async def lifespan(application: FastAPI) -> AsyncGenerator:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 tz = datetime.now(timezone.utc).astimezone().tzinfo
 
 
-class ClientInfo(BaseModel):  # noqa: D101
+class ClientInfo(BaseModel):
     status: int = 500
     id: int = -1
     app_name: str = ""
@@ -50,12 +50,10 @@ class ClientInfo(BaseModel):  # noqa: D101
     client_id: str = ""
     allowed_scopes: str = ""
     redirect_uri: str = ""
-
-    class Config:  # noqa: D106
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
-class ErrorWithDetail(BaseModel):  # noqa: D101
+class ErrorWithDetail(BaseModel):
     detail: str = "Error details. "
 
 
@@ -67,7 +65,7 @@ class ErrorWithDetail(BaseModel):  # noqa: D101
         "404": {"model": ErrorWithDetail},
     },
 )
-async def client_info(  # noqa: D103
+async def client_info(
     client_id: str,
     db_session: Annotated[AsyncSession, Depends(get_db)],
 ) -> ClientInfo:
@@ -79,13 +77,13 @@ async def client_info(  # noqa: D103
     return ClientInfo(status=200, **jsonable_encoder(result[0]))
 
 
-class ApproveData(BaseModel):  # noqa: D101
+class ApproveData(BaseModel):
     client_id: str
     redirect_uri: str
     scope: str
 
 
-class CodeResponse(BaseModel):  # noqa: D101
+class CodeResponse(BaseModel):
     code: str
 
 
@@ -99,7 +97,7 @@ class CodeResponse(BaseModel):  # noqa: D101
         404: {"model": ErrorWithDetail},
     },
 )
-async def approve_authorize(  # noqa: D103
+async def approve_authorize(
     data: ApproveData,
     request: Request,
     db_session: Annotated[AsyncSession, Depends(get_db)],
@@ -134,14 +132,14 @@ async def approve_authorize(  # noqa: D103
     return CodeResponse(code=code)
 
 
-class TokenResponse(BaseModel):  # noqa: D101
+class TokenResponse(BaseModel):
     access_token: str
     scope: str
     expires_in: int
     id_token: str | None = None
 
 
-class GrantTypes(StrEnum):  # noqa: D101
+class GrantTypes(StrEnum):
     AUTHORIZATION_CODE = "authorization_code"
 
 
@@ -154,7 +152,7 @@ class GrantTypes(StrEnum):  # noqa: D101
         404: {"model": ErrorWithDetail},
     },
 )
-async def token_endpoint(  # noqa: D103, PLR0913, PLR0917
+async def token_endpoint(
     grant_type: Annotated[GrantTypes, Form()],
     code: Annotated[str, Form()],
     client_id: Annotated[str, Form()],
@@ -199,23 +197,23 @@ async def token_endpoint(  # noqa: D103, PLR0913, PLR0917
 # https://
 
 
-class RegisterReq(BaseModel):  # noqa: D101
+class RegisterReq(BaseModel):
     username: str
     password: str
     email: str
     nickname: str
 
 
-class LoginReq(BaseModel):  # noqa: D101
+class LoginReq(BaseModel):
     login: str
     password: str
 
 
-class AuthTokenResponse(BaseModel):  # noqa: D101
+class AuthTokenResponse(BaseModel):
     token: str
 
 
-class AuthTokenPayload(BaseModel):  # noqa: D101
+class AuthTokenPayload(BaseModel):
     user_id: int
     created_at: float
     expire_at: float
@@ -230,7 +228,7 @@ class AuthTokenPayload(BaseModel):  # noqa: D101
         409: {"model": ErrorWithDetail},
     },
 )
-async def register(  # noqa: D103
+async def register(
     register_req: RegisterReq,
     response: Response,
     db_session: Annotated[AsyncSession, Depends(get_db)],
@@ -288,7 +286,7 @@ async def register(  # noqa: D103
         401: {"model": ErrorWithDetail},
     },
 )
-async def login(  # noqa: D103
+async def login(
     login_req: LoginReq,
     response: Response,
     db_session: Annotated[AsyncSession, Depends(get_db)],

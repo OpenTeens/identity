@@ -26,6 +26,7 @@ pydantic-settings = "^2.6.0"
 rich = "^13.9.2"
 pyyaml = "^6.0.2"
 ruff = "^0.7.0"
+alembic = "^1.13.3"
 
 [tool.ruff.lint]
 preview = true
@@ -37,10 +38,9 @@ select = [
     "I",
     "UP",
     "RUF",
-    "D",
     "C90",
     "N",
-    "ANN201",
+    "ANN",
     "FA",
     "A",
     "C4",
@@ -64,6 +64,7 @@ select = [
     "FLY",
     "PERF",
     "FURB",
+    "ASYNC",
 ]
 
 ignore = [
@@ -87,8 +88,8 @@ ignore = [
     "D202",
     "D203",
     "D213",
+    "PLR0913",
+    "PLR0917"
 ]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.pyright]

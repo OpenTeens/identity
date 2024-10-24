@@ -1,6 +1,7 @@
-from datetime import datetime  # noqa: D100
+from __future__ import annotations
+
+from datetime import datetime
 from logging import LogRecord
-from typing import Optional
 
 from rich.console import ConsoleRenderable
 from rich.logging import RichHandler
@@ -8,15 +9,15 @@ from rich.traceback import Traceback
 from typing_extensions import override
 
 
-class MyHandler(RichHandler):  # noqa: D101
+class MyHandler(RichHandler):
     @override
     def render(
         self,
         *,
         record: LogRecord,
-        traceback: Optional[Traceback],  # noqa: FA100
-        message_renderable: "ConsoleRenderable",
-    ) -> "ConsoleRenderable":
+        traceback: Traceback | None,
+        message_renderable: ConsoleRenderable,
+    ) -> ConsoleRenderable:
         """Render log for display.
 
         Args: record (LogRecord): logging Record. traceback (Optional[Traceback]):

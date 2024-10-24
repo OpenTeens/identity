@@ -1,4 +1,4 @@
-import logging  # noqa: D100
+import logging
 from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -14,6 +14,6 @@ engine = create_async_engine(
 session_maker = async_sessionmaker(engine)
 
 
-async def get_db() -> AsyncGenerator[AsyncSession]:  # noqa: D103
+async def get_db() -> AsyncGenerator[AsyncSession]:
     async with session_maker() as db:
         yield db
