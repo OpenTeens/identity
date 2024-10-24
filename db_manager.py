@@ -3,10 +3,12 @@ from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from settings import identity_app_settings
+
 logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
 engine = create_async_engine(
-    "sqlite+aiosqlite:///data.db",
+    identity_app_settings.db_conn_url,
     future=True,
     connect_args={"check_same_thread": False},
 )

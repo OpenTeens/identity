@@ -30,6 +30,7 @@ alembic = "^1.13.3"
 
 [tool.ruff.lint]
 preview = true
+exclude = ["alembic"]
 select = [
     "E",
     "F",
@@ -93,3 +94,4 @@ ignore = [
 ]
 
 [tool.pyright]
+exclude = ["alembic"]

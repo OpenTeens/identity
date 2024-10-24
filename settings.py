@@ -27,6 +27,7 @@ class IdentityAppSettings(BaseSettings):
 
     is_prod: bool = False
     secret: str = Field(min_length=128, default=default_secret)
+    db_conn_url: str = Field(default="sqlite+aiosqlite:///data.db")
 
 
 identity_app_settings = IdentityAppSettings()
