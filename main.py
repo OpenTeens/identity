@@ -47,6 +47,7 @@ class ClientInfo(BaseModel):
     id: int = -1
     app_name: str = ""
     app_desc: str = ""
+    app_icon_url: str | None = ""
     client_id: str = ""
     allowed_scopes: str = ""
     redirect_uri: str = ""
