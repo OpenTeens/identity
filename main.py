@@ -1,15 +1,18 @@
 from __future__ import annotations
 
+import base64
 import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
 from enum import StrEnum
-from typing import Annotated
+from functools import lru_cache
+from typing import Annotated, Literal
 
 import argon2
 import jwt
 from argon2.exceptions import VerifyMismatchError
+from Crypto.PublicKey import RSA
 from fastapi import Depends, FastAPI, Form, HTTPException, Request, Response
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, ConfigDict
@@ -40,6 +43,91 @@ webserver = detect_server()
 logger = logging.getLogger(__name__)
 
 tz = datetime.now(timezone.utc).astimezone().tzinfo
+
+
+class OpenIDConfig(BaseModel):
+    issuer: str
+    authorization_endpoint: str
+    token_endpoint: str
+    userinfo_endpoint: str
+    jwks_uri: str
+
+
+@app.get("/.well-known/openid-configuration")
+async def openid_configuration(request: Request) -> OpenIDConfig:
+    host = request.headers.get("Host")
+    return OpenIDConfig(
+        issuer=identity_app_settings.issuer,
+        authorization_endpoint=f"https://{host}/#/authorize",
+        token_endpoint=f"https://{host}/api/token",
+        userinfo_endpoint=f"https://{host}/api/userinfo",
+        jwks_uri=f"https://{host}/.well-known/jwks.json",
+    )
+
+
+class JWKBase(BaseModel):
+    kty: Literal["RSA", "EC", "oct"]
+    use: Literal["enc", "sig"]
+    alg: str | None = None
+    kid: str | None = None
+
+
+class JWKEc(JWKBase):
+    kty: Literal["RSA", "EC", "oct"] = "EC"
+    alg: str | None = "ES256"
+    crv: str
+    x: str
+    y: str
+    d: str | None = None
+
+
+class JWKRsa(JWKBase):
+    kty: Literal["RSA", "EC", "oct"] = "RSA"
+    alg: str | None = "RS256"
+    n: str
+    e: str
+    d: str | None = None
+
+
+class JWKs(BaseModel):
+    keys: list[JWKEc | JWKRsa]
+
+
+@lru_cache
+def get_rsa_key_params() -> tuple[int, int]:
+    key = get_ec_pri_key()
+    return key.n, key.e
+
+
+@lru_cache
+def get_ec_pri_key() -> RSA.RsaKey:
+    return RSA.import_key(identity_app_settings.rsa_pri_key)
+
+
+@lru_cache
+def int_to_base64_octet_string(num: int) -> str:
+    length = num.bit_length()
+    bytes_length = (length + 7) // 8
+    return (
+        base64.urlsafe_b64encode(num.to_bytes(bytes_length, "big"))
+        .rstrip(b"=")
+        .decode()
+    )
+
+
+@app.get("/.well-known/jwks.json")
+async def get_jwks() -> JWKs:
+    params = get_rsa_key_params()
+    return JWKs(
+        keys=[
+            JWKRsa(
+                kid="main",
+                use="sig",
+                n=int_to_base64_octet_string(int(params[0])),
+                e=int_to_base64_octet_string(int(params[1])),
+            )
+        ]
+    )
 
 
 class ClientInfo(BaseModel):
@@ -103,8 +191,21 @@ async def approve_authorize(
     request: Request,
     db_session: Annotated[AsyncSession, Depends(get_db)],
 ) -> CodeResponse:
-    if "username" not in request.cookies:
+    if "token" not in request.cookies:
         raise HTTPException(status_code=401, detail="Unauthorized")
+
+    try:
+        decoded = jwt.decode(
+            request.cookies["token"],
+            key=identity_app_settings.rsa_pub_key,
+            algorithms=["RS256"],
+        )
+    except jwt.InvalidSignatureError as e:
+        raise HTTPException(status_code=401, detail="Token invalid") from e
+    except jwt.ExpiredSignatureError as e:
+        raise HTTPException(status_code=401, detail="Token expired") from e
+
+    user_id = decoded["user_id"]
 
     stmt = select(OAuthApp).where(OAuthApp.client_id == data.client_id)
     oauth_app_result = (await db_session.execute(stmt)).one_or_none()
@@ -120,9 +221,10 @@ async def approve_authorize(
         redirect_uri=data.redirect_uri,
         access_token=random_str(32),
         id_token=jwt.encode(
-            {"username": request.cookies["username"]},
-            oauth_app_obj.client_secret,
-            algorithm="HS256",
+            {"user_id": user_id},
+            key=identity_app_settings.rsa_pri_key,
+            algorithm="RS256",
+            headers={"kid": "main"},
         ),
     )
     db_session.add(code_obj)
@@ -214,10 +316,16 @@ class AuthTokenResponse(BaseModel):
     token: str
 
 
-class AuthTokenPayload(BaseModel):
+class TokenPayload(BaseModel):
+    iat: int | datetime | None = None
+    nbf: int | datetime | None = None
+    exp: int | datetime | None = None
+    iss: str | None = None
+    aud: list[str] | None = None
+
+
+class AuthTokenPayload(TokenPayload):
     user_id: int
-    created_at: float
-    expire_at: float
 
 
 @app.post(
@@ -259,10 +367,14 @@ async def register(
     db_session.add(new_user)
     await db_session.flush()
 
+    now = datetime.now(tz=tz)
+
     token_payload = AuthTokenPayload(
         user_id=new_user.id,
-        created_at=datetime.now(tz=tz).timestamp(),
-        expire_at=(datetime.now(tz=tz) + timedelta(days=7)).timestamp(),
+        iss=identity_app_settings.issuer,
+        iat=now,
+        nbf=now,
+        exp=now + timedelta(days=7),
     )
 
     await (
@@ -271,8 +383,9 @@ async def register(
 
     token = jwt.encode(
         token_payload.model_dump(),
-        identity_app_settings.secret,
-        algorithm="HS256",
+        key=identity_app_settings.rsa_pri_key,
+        algorithm="RS256",
+        headers={"kid": "main"},
     )
 
     response.set_cookie("token", token)
@@ -305,16 +418,21 @@ async def login(
     except VerifyMismatchError:
         raise HTTPException(status_code=401, detail="Invalid credentials") from None
 
+    now = datetime.now(tz=tz)
+
     token_payload = AuthTokenPayload(
         user_id=result.id,
-        created_at=datetime.now(tz=tz).timestamp(),
-        expire_at=(datetime.now(tz=tz) + timedelta(days=7)).timestamp(),
+        iss=identity_app_settings.issuer,
+        iat=now,
+        nbf=now,
+        exp=now + timedelta(days=7),
     )
 
     token = jwt.encode(
         token_payload.model_dump(),
-        identity_app_settings.secret,
-        algorithm="HS256",
+        key=identity_app_settings.rsa_pri_key,
+        algorithm="RS256",
+        headers={"kid": "main"},
     )
 
     response.set_cookie("token", token)
@@ -342,4 +460,10 @@ if not identity_app_settings.is_prod:
 
 if identity_app_settings.secret == settings.default_secret:
     logger.warning("App is using default secret which is uploaded to the GitHub repo. ")
+    logger.warning("Change it to a strong secret in production.")
+
+if identity_app_settings.rsa_pri_key == settings.default_rsa_pri_key:
+    logger.warning(
+        "App is using default rsa keys which is uploaded to the GitHub repo. "
+    )
     logger.warning("Change it to a strong secret in production.")
