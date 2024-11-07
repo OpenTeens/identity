@@ -2,33 +2,28 @@
 name = "identity-backend"
 version = "0.1.0"
 description = ""
-authors = [
-    { name = "OpenTeens" },
-    { name = "mtf-im" }
-]
+authors = [{ name = "OpenTeens" }, { name = "mtf-im" }]
 readme = "README.md"
 requires-python = "<4.0, >= 3.9"
+dependencies = [
+    "aiosqlite>=0.20.0",
+    "alembic>=1.14.0",
+    "argon2-cffi>=23.1.0",
+    "cryptography>=43.0.3",
+    "fastapi>=0.115.4",
+    "pycryptodome>=3.21.0",
+    "pydantic-settings>=2.6.1",
+    "pyjwt>=2.9.0",
+    "python-multipart>=0.0.17",
+    "pyyaml>=6.0.2",
+    "rich>=13.9.4",
+    "ruff>=0.7.2",
+    "sqlalchemy>=2.0.36",
+    "uvicorn>=0.32.0",
+]
 
 [tool.poetry]
 package-mode = false
-
-[tool.poetry.dependencies]
-python = "<4.0, >= 3.9"
-fastapi = "^0.115.2"
-pyjwt = "^2.9.0"
-sqlalchemy = "^2.0.36"
-aiosqlite = "^0.20.0"
-argon2-cffi = "^23.1.0"
-black = "^24.10.0"
-uvicorn = "^0.32.0"
-python-multipart = "^0.0.12"
-pydantic-settings = "^2.6.0"
-rich = "^13.9.2"
-pyyaml = "^6.0.2"
-ruff = "^0.7.0"
-alembic = "^1.13.3"
-pycryptodome = "^3.21.0"
-cryptography = "^43.0.3"
 
 [tool.ruff.lint]
 preview = true
