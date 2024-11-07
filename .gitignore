@@ -6,4 +6,5 @@ __pycache__/
 *.secrets.*
 .dev.env
 .prod.env
-.idea
+.idea/
+.ruff_cache/
