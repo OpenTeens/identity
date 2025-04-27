@@ -1,0 +1,38 @@
+{
+    "openid": {
+        "title": "authorize.permissions.token.title",
+        "desc": "authorize.permissions.token.describe",
+        "icon": "card-account-details",
+        "danger": 0
+    },
+    "profile": {
+        "title": "authorize.permissions.profile.title",
+        "desc": "authorize.permissions.profile.describe",
+        "icon": "account-circle",
+        "danger": 0
+    },
+    "email": {
+        "title": "authorize.permissions.email.title",
+        "desc": "authorize.permissions.email.describe",
+        "icon": "email",
+        "danger": 0
+    },
+    "phone": {
+        "title": "authorize.permissions.phone.title",
+        "desc": "authorize.permissions.phone.describe",
+        "icon": "phone",
+        "danger": 0
+    },
+    "address": {
+        "title": "authorize.permissions.address.title",
+        "desc": "authorize.permissions.address.describe",
+        "icon": "map-marker",
+        "danger": 1
+    },
+    "unknown": {
+        "title": "authorize.permissions.unknow.title",
+        "desc": "authorize.permissions.unknow.describe",
+        "icon": "help",
+        "danger": 2
+    }
+}

@@ -4,6 +4,7 @@ import { ofetch } from "ofetch";
 import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import { getScopeDetail } from "../../scopes/index.ts";
 import { AuthorizeParams, ClientInfo } from "../../types.ts";
 
 const { t } = useI18n(); // 获取国际化的 `t` 函数
@@ -79,55 +80,7 @@ const error = computed(() => {
     return "";
 });
 
-// get scope detail
-function get_scope_detail(scope: string) {
-    switch (scope) {
-        case "openid":
-            return {
-                title: "authorize.permissions.token.title",
-                desc: "authorize.permissions.token.describe",
-                icon: "card-account-details",
-                danger: 0,
-            };
-        case "profile":
-            return {
-                title: "authorize.permissions.profile.title",
-                desc: "authorize.permissions.profile.describe",
-                icon: "account-circle",
-                danger: 0,
-            };
-        case "email":
-            return {
-                title: "authorize.permissions.email.title",
-                desc: "authorize.permissions.email.describe",
-                icon: "email",
-                danger: 0,
-            };
-        case "phone":
-            return {
-                title: "authorize.permissions.phone.title",
-                desc: "authorize.permissions.phone.describe",
-                icon: "phone",
-                danger: 0,
-            };
-        case "address":
-            return {
-                title: "authorize.permissions.address.title",
-                desc: "authorize.permissions.address.describe",
-                icon: "map-marker",
-                danger: 1,
-            };
-        default:
-            return {
-                title: "authorize.permissions.unknow.title",
-                desc: "authorize.permissions.unknow.describe",
-                icon: "help",
-                danger: 2,
-            };
-    }
-}
-
-var scope_detail = data.scope.split(" ").map(get_scope_detail);
+var scope_detail = data.scope.split(" ").map(getScopeDetail);
 // Theme
 // StyleProvider(Themes.md3Dark);
 </script>
