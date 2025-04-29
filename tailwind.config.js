@@ -2,7 +2,7 @@
 import { presetVarlet } from "@varlet/preset-tailwindcss";
 
 export default {
-    content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx,vue}"],
+    content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx,vue,json}"],
     theme: {
         extend: {},
     },

@@ -116,17 +116,7 @@ var scope_detail = data.scope.split(" ").map(getScopeDetail);
                 <var-divider />
 
                 <div v-for="x in scope_detail" :key="x.title">
-                    <var-cell
-                        border
-                        :icon="x.icon"
-                        :title="t(x.title)"
-                        :description="t(x.desc)"
-                        :class="'permfield-dangerlv--' + x.danger"
-                    >
-                        <template #extra>
-                            <!-- <var-icon name="information" class="transparent-50" /> -->
-                        </template>
-                    </var-cell>
+                    <PermissionCell :permission="x" />
                 </div>
 
                 <var-divider />
@@ -181,22 +171,5 @@ var scope_detail = data.scope.split(" ").map(getScopeDetail);
 
 .var-avatar {
     background-color: transparent;
-}
-
-.transparent-50 {
-    opacity: 0.5;
-}
-
-.permfield-dangerlv--1 {
-    color: var(--color-warning);
-}
-
-.permfield-dangerlv--2 {
-    color: var(--color-danger);
-}
-
-.permfield-dangerlv--3 {
-    background-color: var(--color-danger);
-    color: white;
 }
 </style>

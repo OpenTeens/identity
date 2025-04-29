@@ -2,7 +2,7 @@ export interface Permission {
     title: string;
     desc: string;
     icon: string;
-    danger: number;
+    sensitivity: number;
 }
 
 export type Permissions = Record<string, Permission>;

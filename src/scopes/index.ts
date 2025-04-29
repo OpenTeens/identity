@@ -5,3 +5,6 @@ export function getScopeDetail(scope: string): Permission {
     if (scope in permissions) return permissions[scope];
     return permissions.unknown;
 }
+
+export { permissions };
+export type { Permission };

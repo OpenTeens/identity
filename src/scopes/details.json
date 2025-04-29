@@ -21,13 +21,13 @@
         "title": "authorize.permissions.phone.title",
         "desc": "authorize.permissions.phone.describe",
         "icon": "phone",
-        "sensitivity": 0
+        "sensitivity": 111
     },
     "address": {
         "title": "authorize.permissions.address.title",
         "desc": "authorize.permissions.address.describe",
         "icon": "map-marker",
-        "sensitivity": 1
+        "sensitivity": 3
     },
     "unknown": {
         "title": "authorize.permissions.unknown.title",

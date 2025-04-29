@@ -10,9 +10,12 @@ declare module 'vue' {
     FooterBar: typeof import('./src/components/FooterBar.vue')['default']
     IMdiTranslate: typeof import('~icons/mdi/translate')['default']
     LanguageSwitch: typeof import('./src/components/LanguageSwitch.vue')['default']
+    PermissionCell: typeof import('./src/components/PermissionCell.vue')['default']
+    PermissionSensitivityIcon: typeof import('./src/components/PermissionSensitivityIcon.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     VarAvatar: typeof import('@varlet/ui')['_AvatarComponent']
+    VarBadge: typeof import('@varlet/ui')['_BadgeComponent']
     VarButton: typeof import('@varlet/ui')['_ButtonComponent']
     VarCell: typeof import('@varlet/ui')['_CellComponent']
     VarCol: typeof import('@varlet/ui')['_ColComponent']
@@ -27,5 +30,6 @@ declare module 'vue' {
     VarResult: typeof import('@varlet/ui')['_ResultComponent']
     VarRow: typeof import('@varlet/ui')['_RowComponent']
     VarSpace: typeof import('@varlet/ui')['_SpaceComponent']
+    VarTooltip: typeof import('@varlet/ui')['_TooltipComponent']
   }
 }

@@ -11,6 +11,7 @@
         "prepare": "husky"
     },
     "dependencies": {
+        "@iconify/vue": "^4.3.0",
         "@varlet/ui": "^3.8.2",
         "@vueuse/core": "^12.3.0",
         "@vueuse/integrations": "^12.3.0",
