@@ -12,7 +12,6 @@ body {
     justify-content: center;
 
     color: var(--color-text);
-    /* background-color: var(--color-body); */
-    /* TODO: 将这个改为某种在外部控制的变量 */
-    background: linear-gradient(to right, #5bcefa, #f5a9b8);
+    --color-body: #ffddee;
+    background-color: var(--color-body);
 }
