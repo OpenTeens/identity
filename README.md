@@ -3,19 +3,19 @@
 ## Install Deps
 
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 ## Run
 
 ```bash
-uvicorn main:app --port 35271
+uv run uvicorn main:app --port 35271
 ```
 
 ## Export Requirements
 
-这个不用跑 QAQ 只是我们用 poetry 的生成 `requirements.txt`
+这个不用跑 QAQ 只是用 `uv` 生成 `requirements.txt`
 
 ```bash
-poetry export --without-hashes --format=requirements.txt > requirements.txt
+uv export --format requirements-txt > requirements.txt
 ```
