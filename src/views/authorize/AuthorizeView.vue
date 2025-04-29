@@ -94,16 +94,10 @@ var scope_detail = data.scope.split(" ").map(getScopeDetail);
             <!-- <div id="authbox"> -->
             <var-paper id="area-avatar" :radius="3">
                 <var-space align="center" justify="center">
-                    <var-avatar
-                        src="https://mtf.im/tpf.svg"
-                        class="var-elevation--2"
-                    />
+                    <var-avatar src="/favicon.ico" class="var-elevation--2" />
                     <var-loading type="disappear" color="#aaa" />
                     <var-avatar
-                        :src="
-                            info.app_icon_url ??
-                            'https://inswan.cn/assets/community_test_logo.webp'
-                        "
+                        :src="info.app_icon_url ?? '/favicon.ico'"
                         class="var-elevation--2"
                         :round="false"
                     />

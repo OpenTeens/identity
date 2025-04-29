@@ -31,9 +31,9 @@ const route = useRoute();
 const title = computed(() => {
     let title = route.meta.title as string | undefined;
     if (title === undefined) {
-        title = "MtF.im Identity Center";
+        title = "Identity";
     } else {
-        title += " - MtF.im ID Center";
+        title += " - Identity ID Center";
     }
     return title;
 });

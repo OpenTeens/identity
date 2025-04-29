@@ -9,7 +9,7 @@ let { t } = useI18n();
     </var-divider>
     <div class="footer flex items-center justify-center">
         <span
-            >{{ new Date().getFullYear() }} MtF.im is made with
+            >{{ new Date().getFullYear() }} Identity is made with
             <var-icon name="heart" color="pink"
         /></span>
     </div>
@@ -27,7 +27,7 @@ let { t } = useI18n();
         >
         <var-divider vertical />
         <span
-            ><a href="//mtf.im/about-us">{{ t("footer.about-us") }}</a></span
+            ><a href="/about-us">{{ t("footer.about-us") }}</a></span
         >
     </div>
 </template>
