@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+        <title>MtF.im Identity Center</title>
+    </head>
+
+    <body>
+        <div id="app"></div>
+        <script type="module" src="./src/index.ts"></script>
+        <script>
+            // Example JavaScript to change language settings based on user's choice or browser settings
+            document.addEventListener("DOMContentLoaded", () => {
+                const userLang = navigator.language || navigator.userLanguage;
+                // Logic to determine the language (simplified here)
+                const lang = userLang.startsWith("zh")
+                    ? "zh"
+                    : userLang.startsWith("ja")
+                      ? "ja"
+                      : "en";
+                document.documentElement.setAttribute("lang", lang);
+            });
+        </script>
+    </body>
+</html>
