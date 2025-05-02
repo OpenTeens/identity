@@ -1,5 +1,0 @@
-"*.{js,jsx,ts,tsx,vue,md}":
-    - prettier --write
-    - eslint --fix
-"*.{css,scss,json,yml,yaml,html}": # WIP
-    - prettier --write
