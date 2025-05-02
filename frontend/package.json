@@ -14,7 +14,7 @@
         "@varlet/ui": "^3.8.2",
         "@vueuse/core": "^12.3.0",
         "@vueuse/integrations": "^12.3.0",
-        "axios": "^1.7.9",
+        "axios": "^1.8.2",
         "jose": "^5.9.6",
         "modern-normalize": "^3.0.1",
         "ofetch": "^1.4.1",
