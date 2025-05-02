@@ -1,0 +1,101 @@
+name: Frontend Linters
+on:
+  push:
+    branches:
+      - "**"
+    paths:
+      - "frontend/**"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "frontend/**"
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: aaa
+        run: |
+          pwd
+          echo $GITHUB_WORKSPACE
+          ls -la
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: |
+          pnpm install
+
+      - name: Run tsc
+        run: |
+          pnpm vue-tsc --noEmit
+
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: |
+          pnpm install
+
+      - name: Run Prettier
+        run: |
+          pnpm prettier --list-different .
+
+  eslint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: |
+          pnpm install
+
+      - name: Run ESLint
+        run: |
+          pnpm eslint .
