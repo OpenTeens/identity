@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = [{ name = "OpenTeens" }, { name = "mtf-im" }]
 readme = "README.md"
-requires-python = "<4.0, >= 3.9"
+requires-python = "<4.0, >= 3.13"
 dependencies = [
     "aiosqlite>=0.20.0",
     "alembic>=1.14.0",
@@ -14,6 +14,7 @@ dependencies = [
     "pycryptodome>=3.21.0",
     "pydantic-settings>=2.6.1",
     "pyjwt>=2.9.0",
+    "pyright>=1.1.400",
     "python-multipart>=0.0.17",
     "pyyaml>=6.0.2",
     "rich>=13.9.4",
@@ -25,9 +26,11 @@ dependencies = [
 [tool.poetry]
 package-mode = false
 
-[tool.ruff.lint]
+[tool.ruff]
 preview = true
-exclude = ["alembic"]
+extend-exclude = ["alembic/versions/**"]
+
+[tool.ruff.lint]
 select = [
     "E",
     "F",
@@ -87,7 +90,8 @@ ignore = [
     "D213",
     "PLR0913",
     "PLR0917",
+    "ERA001",
 ]
 
 [tool.pyright]
-exclude = ["alembic"]
+exclude = ["alembic/versions/**", "**/node_modules", "**/.venv"]
