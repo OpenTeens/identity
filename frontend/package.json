@@ -49,7 +49,7 @@
         "unplugin-detect-duplicated-deps": "^2.0.0",
         "unplugin-icons": "^0.20.2",
         "unplugin-vue-components": "^0.27.5",
-        "vite": "^6.0.7",
+        "vite": "^6.1.6",
         "vite-bundle-analyzer": "^0.15.2",
         "vite-plugin-dynamic-chunk": "0.0.3-alpha.5",
         "vite-plugin-inspect": "^0.10.6",
