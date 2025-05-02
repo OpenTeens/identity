@@ -1,3 +1,4 @@
+# noqa: INP001
 import asyncio
 from logging.config import fileConfig
 

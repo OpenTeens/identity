@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from datetime import datetime
 from logging import LogRecord
+from typing import override
 
 from rich.console import ConsoleRenderable
 from rich.logging import RichHandler
 from rich.traceback import Traceback
-from typing_extensions import override
 
 
 class MyHandler(RichHandler):

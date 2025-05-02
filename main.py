@@ -4,7 +4,7 @@ import base64
 import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from functools import lru_cache
 from typing import Annotated, Literal
@@ -42,7 +42,7 @@ hasher = argon2.PasswordHasher(time_cost=1, memory_cost=4096)
 webserver = detect_server()
 logger = logging.getLogger(__name__)
 
-tz = datetime.now(timezone.utc).astimezone().tzinfo
+tz = datetime.now(UTC).astimezone().tzinfo
 
 
 class OpenIDConfig(BaseModel):
@@ -212,7 +212,7 @@ async def approve_authorize(
 
     if not oauth_app_result:
         raise HTTPException(status_code=404, detail="Invalid client_id")
-    oauth_app_obj: OAuthApp = oauth_app_result[0]
+    _oauth_app_obj: OAuthApp = oauth_app_result[0]
 
     code_obj = Code(
         code=random_str(32),
