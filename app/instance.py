@@ -19,13 +19,14 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import settings
+import settings as settings
 from db_manager import engine, get_db
 from db_models import Base, Code, OAuthApp, User
 from settings import identity_app_settings
-from utils.log_handler import MyHandler
+from utils.log_handler import MyHandler as MyHandler
 from utils.randoms import random_str
-from utils.servers import ASGIServer, detect_server
+from utils.servers import ASGIServer as ASGIServer
+from utils.servers import detect_server as detect_server
 
 
 @asynccontextmanager
@@ -38,10 +39,7 @@ async def lifespan(application: FastAPI) -> AsyncGenerator:
 
 app = FastAPI(lifespan=lifespan)
 hasher = argon2.PasswordHasher(time_cost=1, memory_cost=4096)
-
-webserver = detect_server()
 logger = logging.getLogger(__name__)
-
 tz = datetime.now(UTC).astimezone().tzinfo
 
 
@@ -437,33 +435,3 @@ async def login(
 
     response.set_cookie("token", token)
     return AuthTokenResponse(token=token)
-
-
-if webserver == ASGIServer.UVICORN:
-    uvicorn_logger = logging.getLogger("uvicorn")
-    uvicorn_access_logger = logging.getLogger("uvicorn.access")
-    uvicorn_logger.handlers = uvicorn_access_logger.handlers = []
-    uvicorn_logger.propagate = uvicorn_access_logger.propagate = True
-
-
-logging.basicConfig(
-    level=logging.INFO,
-    datefmt="[%x %X]",
-    format="{message}",
-    style="{",
-    handlers=[MyHandler()],
-)
-
-if not identity_app_settings.is_prod:
-    logger.warning("App is running in development mode.")
-    logger.warning("Change it to production mode in production.")
-
-if identity_app_settings.secret == settings.default_secret:
-    logger.warning("App is using default secret which is uploaded to the GitHub repo. ")
-    logger.warning("Change it to a strong secret in production.")
-
-if identity_app_settings.rsa_pri_key == settings.default_rsa_pri_key:
-    logger.warning(
-        "App is using default rsa keys which is uploaded to the GitHub repo. "
-    )
-    logger.warning("Change it to a strong secret in production.")

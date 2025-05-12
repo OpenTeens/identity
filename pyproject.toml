@@ -64,7 +64,6 @@ select = [
     "S",     # flake8-bandit
     "SIM",
     "SLF",
-    "TC",    # flake8-type-checking
     "TD",
     "TID",
     "TRY",
@@ -86,7 +85,6 @@ ignore = [
     "Q002",
     "Q003",
     "W191",
-    # "ISC001", # No longer conflicts since ruff 0.9.0
     "ISC002",
     "E501",   # Line too long; ignored because occasional overflow is acceptable
 
@@ -102,5 +100,5 @@ ignore = [
 exclude = ["alembic/versions/**", "**/node_modules", "**/.venv"]
 
 [tool.taskipy.tasks]
-dev = "uvicorn app:app --port 35271 --reload"
-serve = 'uvicorn app:app --host 0.0.0.0 --port 80 --proxy-headers --forwarded-allow-ips "127.0.0.1/8, ::1/128"'
+dev = "uvicorn app.main:app --port 35271 --reload"
+serve = 'uvicorn app.main:app --host 0.0.0.0 --port 80 --proxy-headers --forwarded-allow-ips "127.0.0.1/8, ::1/128"'
