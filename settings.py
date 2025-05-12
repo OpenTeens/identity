@@ -4,7 +4,7 @@ from typing import Self
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-rand = Random("7ytgfvbghy")  # 保证每次运行都使用同一个默认 secret
+rand = Random("7ytgfvbghy")  # 保证每次运行都使用同一个默认 secret  # noqa: S311
 
 # 默认密钥会出现在GitHub仓库中因此绝对不可以用于生产环境
 default_secret = rand.randbytes(128 // 2).hex()
