@@ -12,7 +12,7 @@ from typing import Annotated, Literal
 import argon2
 import jwt
 from argon2.exceptions import VerifyMismatchError
-from Crypto.PublicKey import RSA
+from Cryptodome.PublicKey import RSA
 from fastapi import Depends, FastAPI, Form, HTTPException, Request, Response
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, ConfigDict
