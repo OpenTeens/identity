@@ -1,6 +1,6 @@
 """Utility generating random datas."""
 
-import random
+import secrets
 import string
 
 
@@ -17,4 +17,6 @@ def random_str(length: int) -> str:
         str: A randomly generated string of the specified length.
 
     """
-    return "".join(random.choices(string.ascii_letters + string.digits, k=length))
+    return "".join(
+        secrets.choice(string.ascii_letters + string.digits) for _ in range(length)
+    )
