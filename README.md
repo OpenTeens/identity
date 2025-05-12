@@ -21,5 +21,5 @@ uv sync
 ## Run
 
 ```bash
-uv run uvicorn main:app --port 35271
+uv run task dev
 ```
