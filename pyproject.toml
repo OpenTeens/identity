@@ -67,30 +67,29 @@ select = [
 ]
 
 ignore = [
+    # Conflicts with formatter (https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules)
     "COM812",
     "COM819",
-    "D202",
-    "D203",
     "D206",
-    "D213",
     "D300",
     "E111",
     "E114",
     "E117",
-    "E203",
-    "E501",
-    "E701",
-    "ERA001",
-    "ISC001",
-    "ISC002",
-    "PLC0414",
-    "PLR0913",
-    "PLR0917",
     "Q000",
     "Q001",
     "Q002",
     "Q003",
     "W191",
+    # "ISC001", # No longer conflicts since ruff 0.9.0
+    "ISC002",
+    "E501",   # Line too long; ignored because occasional overflow is acceptable
+
+    "D203",    # No incorrect blank line before class; conflicts with D211, and `google`, `numpy` and `pep257` are more common
+    "D213",    # Docstring summary line should at the 2nd line; conflicts with D212, and I'd like to start docstring summary should  at the first line
+    "ERA001",  # No commented-out code; but it's annoying 
+    "PLC0414", # No useless import alias; conflicts with Re-export, eg. F401
+    "PLR0913", # Too many arguments; annoying when using FastAPI
+    "PLR0917", # Too many positional arguments; annoying when using FastAPI
 ]
 
 [tool.pyright]
