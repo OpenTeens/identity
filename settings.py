@@ -25,7 +25,7 @@ class IdentityAppSettings(BaseSettings):
     @model_validator(mode="after")
     def check_secret(self) -> Self:
         if self.is_prod and self.secret == default_secret:
-            raise ValueError("Secret cannot be default in production")
+            raise ValueError("Secret cannot be default in production")  # noqa: TRY003
         return self
 
     is_prod: bool = False
