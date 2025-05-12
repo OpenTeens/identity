@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 from datetime import datetime
-from logging import LogRecord
-from typing import override
+from typing import TYPE_CHECKING, override
 
-from rich.console import ConsoleRenderable
 from rich.logging import RichHandler
-from rich.traceback import Traceback
+
+if TYPE_CHECKING:
+    from logging import LogRecord
+
+    from rich.console import ConsoleRenderable
+    from rich.traceback import Traceback
 
 
 class MyHandler(RichHandler):
