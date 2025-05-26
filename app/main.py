@@ -1,7 +1,29 @@
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+
 import settings
 from app.instance import ASGIServer, MyHandler, identity_app_settings, logger, logging
 from app.instance import app as app
+from db_manager import engine
+from db_models.base import Base
 from utils.servers import detect_server
+
+inner_lifespan = app.router.lifespan_context
+
+
+@asynccontextmanager
+async def main_lifespan(application: FastAPI) -> AsyncGenerator:
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    async with inner_lifespan(application):
+        yield
+
+
+app.router.lifespan_context = main_lifespan
+
 
 webserver = detect_server()
 

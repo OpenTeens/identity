@@ -20,8 +20,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import settings as settings
-from db_manager import engine, get_db
-from db_models import Base, Code, OAuthApp, User
+from db_manager import get_db
+from db_models import Code, OAuthApp, User
 from settings import identity_app_settings
 from utils.log_handler import MyHandler as MyHandler
 from utils.randoms import random_str
@@ -31,9 +31,6 @@ from utils.servers import detect_server as detect_server
 
 @asynccontextmanager
 async def lifespan(application: FastAPI) -> AsyncGenerator:
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
     yield
 
 
