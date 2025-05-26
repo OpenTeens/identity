@@ -23,9 +23,7 @@ import settings as settings
 from db_manager import get_db
 from db_models import Code, OAuthApp, User
 from settings import identity_app_settings
-from utils.log_handler import MyHandler as MyHandler
 from utils.randoms import random_str
-from utils.servers import ASGIServer as ASGIServer
 from utils.servers import detect_server as detect_server
 
 

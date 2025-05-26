@@ -1,22 +1,55 @@
+import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
 import settings
-from app.instance import ASGIServer, MyHandler, identity_app_settings, logger, logging
+from alembic.autogenerate import compare_metadata
+from alembic.migration import MigrationContext
 from app.instance import app as app
+from app.instance import logger
 from db_manager import engine
-from db_models.base import Base
-from utils.servers import detect_server
+from db_models import Base
+from settings import identity_app_settings
+from utils.log_handler import MyHandler
+from utils.servers import ASGIServer, detect_server
+
+
+class SchemaMismatchError(Exception):
+    """DB schema does not match SQLAlchemy models."""
+
+    def __init__(self, diffs: list) -> None:
+        super().__init__(
+            f"{diffs}\n"
+            "❌ Detected database schema differences. Did you forget to run migrations?\n"
+        )
+
+
+async def ensure_db_schema_consistency() -> None:
+    async with engine.connect() as connection:
+        context = await connection.run_sync(
+            MigrationContext.configure,
+            url=identity_app_settings.db_conn_url,
+            dialect_opts={"paramstyle": "named"},
+        )
+
+        diffs = await connection.run_sync(
+            lambda _: compare_metadata(context, Base.metadata)
+        )
+
+    if diffs:
+        raise SchemaMismatchError(diffs)
+
 
 inner_lifespan = app.router.lifespan_context
 
 
 @asynccontextmanager
 async def main_lifespan(application: FastAPI) -> AsyncGenerator:
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    # async with engine.begin() as conn:
+    #     await conn.run_sync(Base.metadata.create_all)
+    await ensure_db_schema_consistency()
 
     async with inner_lifespan(application):
         yield
