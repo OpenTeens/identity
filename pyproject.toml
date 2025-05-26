@@ -72,7 +72,7 @@ select = [
 ]
 
 ignore = [
-    # Conflicts with formatter (https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules)
+    # Those conflicts with formatter (https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules)
     "COM812",
     "COM819",
     "D206",
@@ -94,6 +94,7 @@ ignore = [
     "PLC0414", # No useless import alias; conflicts with Re-export, eg. F401
     "PLR0913", # Too many arguments; annoying when using FastAPI
     "PLR0917", # Too many positional arguments; annoying when using FastAPI
+    "RUF029",  # Unused Async; annoying when using FastAPI
 ]
 
 [tool.pyright]
