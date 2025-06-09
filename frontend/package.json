@@ -33,7 +33,7 @@
         "@varlet/preset-tailwindcss": "^3.8.2",
         "@vitejs/plugin-vue": "^5.2.1",
         "autoprefixer": "^10.4.20",
-        "core-js": "^3.39.0",
+        "core-js": "^3.43.0",
         "eslint": "^9.17.0",
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-vue": "^9.32.0",
